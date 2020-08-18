@@ -23,7 +23,7 @@ const App = () => {
   const [score, setScore] = useState(0);
   const [gameOver, setGameOver] = useState(true);
 
-  console.log(fetchQuizQuestions(TOTAL_QUESTIONS, Difficulty.EASY));
+  console.log(questions);
 
   const startTrivia = async () => {
       setLoading(true);
@@ -32,7 +32,13 @@ const App = () => {
       const newQuestions = await fetchQuizQuestions(
         TOTAL_QUESTIONS,
         Difficulty.EASY
-      )
+      );
+
+      setQuestions(newQuestions);
+      setScore(0);
+      setUserAnswers([]);
+      setNumber(0);
+      setLoading(false);
   };
 
   const checkAnswer = (e: React.MouseEvent<HTMLButtonElement>) => {
@@ -46,21 +52,25 @@ const App = () => {
   return (
      <div className='App'>
         <h1>Jogo de Perguntas e respostas em REact</h1>
+        {gameOver || userAnswers.length === TOTAL_QUESTIONS ? (
           <button className='start' onClick={startTrivia}>
             Começar
           </button>
-          <p className='score'> Pontuação:</p>
-          <p>Carregar questão...</p>
-          {
-            // <QuestionCard
-            //   questionNr={number + 1}
-            //   totalQuestions={TOTAL_QUESTIONS}
-            //   question={questions[number].question}
-            //   answers={question[number].answers}
-            //   userAnswer={userAnswers ? userAnswers[number] : undefined}
-            //   callback={checkAnswer}
-            // />
-          }
+        ) : null }
+
+        { !gameOver ? <p className='score'> Pontuação:</p> : null }
+
+        { loading && <p>Carregar questão...</p> }
+          { !gameOver && !loading && (
+            <QuestionCard
+              questionNr={number + 1}
+              totalQuestions={TOTAL_QUESTIONS}
+              question={questions[number].question}
+              answers={questions[number].answer}
+              userAnswer={userAnswers ? userAnswers[number] : undefined}
+              callback={checkAnswer}
+            />
+          )}
           <button className='next' onClick={nextQuestion}>
             Próxima pergunta
           </button>
